@@ -1265,7 +1265,11 @@
     ],
     "_tag": -1,
     "_active": true,
-    "_components": [],
+    "_components": [
+      {
+        "__id__": 34
+      }
+    ],
     "_prefab": null,
     "_id": "20DwGSwnlPx5JDSqYNeAFG",
     "_opacity": 255,
@@ -1284,8 +1288,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 0,
-      "height": 0
+      "width": 740,
+      "height": 433
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -1294,7 +1298,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 0
+      "y": -11
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -1316,9 +1320,6 @@
     "_components": [
       {
         "__id__": 33
-      },
-      {
-        "__id__": 34
       }
     ],
     "_prefab": null,
@@ -1390,24 +1391,18 @@
     "_N$horizontalDirection": 0
   },
   {
-    "__type__": "cc.ScrollView",
+    "__type__": "cc.Mask",
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 32
+      "__id__": 31
     },
     "_enabled": true,
-    "content": {
-      "__id__": 32
-    },
-    "horizontal": true,
-    "vertical": true,
-    "inertia": true,
-    "brake": 0.5,
-    "elastic": true,
-    "bounceDuration": 1,
-    "scrollEvents": [],
-    "cancelInnerEvents": true
+    "_type": 0,
+    "_segements": 64,
+    "_N$spriteFrame": null,
+    "_N$alphaThreshold": 1,
+    "_N$inverted": false
   },
   {
     "__type__": "cc.Sprite",

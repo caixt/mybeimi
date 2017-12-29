@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import com.github.cxt.mybeimi.core.BMDataContext;
 import com.github.cxt.mybeimi.core.engine.game.state.GameEvent;
 import com.github.cxt.mybeimi.core.engine.game.task.majiang.CreateMJRaiseHandsTask;
@@ -29,6 +30,53 @@ import com.github.cxt.mybeimi.web.model.PlayUserClient;
 @Service(value="beimiGameEngine")
 public class GameEngine {
 	
+	
+	/**
+	 * 检查是否所有玩家 都已经处于就绪状态，如果所有玩家都点击了 继续开始游戏，则发送一个 ALL事件，继续游戏，
+	 * 否则，等待10秒时间，到期后如果玩家还没有就绪，就将该玩家T出去，等待新玩家加入
+	 * @param roomid
+	 * @param userid
+	 * @param orgi
+	 * @return
+	 */
+	public void restartRequest(String roomid , String userid , BeiMiClient beiMiClient){
+		GameRoom gameRoom = (GameRoom) CacheHelper.getGameRoomCacheBean().getCacheObject(roomid) ;
+		boolean notReady = false ;
+		List<PlayUserClient> playerList = CacheHelper.getGamePlayerCacheBean().getCacheObject(gameRoom.getId()) ;
+		if(playerList!=null && playerList.size() > 0){
+			/**
+			 * 有一个 等待 
+			 */
+			for(int i=0; i<playerList.size() ; ){
+				PlayUserClient player = playerList.get(i) ;
+				if(player.getPlayertype().equals(BMDataContext.PlayerTypeEnum.NORMAL.toString())){
+					//普通玩家，当前玩家修改为READY状态
+					PlayUserClient apiPlayUser = (PlayUserClient) CacheHelper.getApiUserCacheBean().getCacheObject(player.getId()) ;
+					if(player.getId().equals(userid)){
+						player.setGamestatus(BMDataContext.GameStatusEnum.READY.toString());
+						/**
+						 * 更新状态
+						 */
+						CacheHelper.getApiUserCacheBean().put(player.getId(), apiPlayUser);
+					}else{//还有未就绪的玩家
+						if(!player.getGamestatus().equals(BMDataContext.GameStatusEnum.READY.toString())){
+							notReady = true ;
+						}
+					}
+				}
+				i++ ;
+			}
+		}
+		if(notReady == true){
+			/**
+			 * 需要增加一个状态机的触发事件：等待其他人就绪，超过5秒以后未就绪的，直接踢掉，然后等待机器人加入
+			 */
+			GameUtils.getGame(gameRoom.getPlayway()).change(gameRoom , BeiMiGameEvent.ENTER.toString() , 0);
+		}else if(playerList == null || playerList.size() == 0){//房间已解散
+			PlayUserClient userClient = (PlayUserClient) CacheHelper.getApiUserCacheBean().getCacheObject(userid) ;
+			BMDataContext.getGameEngine().gameRequest(userid, beiMiClient.getPlayway(), beiMiClient.getRoom(), userClient , beiMiClient) ;
+		}
+	}
 	/**
 	 * 出牌，并校验出牌是否合规
 	 * @param roomid
@@ -249,8 +297,8 @@ public class GameEngine {
 		return takeCards ;
 	}
 	
-	public void gameRequest(String userid ,String playway , String room , String orgi , PlayUserClient userClient , BeiMiClient beiMiClient ){
-		GameEvent gameEvent = gameRequest(userClient.getId(), beiMiClient.getPlayway(), beiMiClient.getRoom(), beiMiClient.getOrgi(), userClient) ;
+	public void gameRequest(String userid ,String playway , String room , PlayUserClient userClient , BeiMiClient beiMiClient ){
+		GameEvent gameEvent = gameRequest(userClient.getId(), beiMiClient.getPlayway(), beiMiClient.getRoom(), userClient) ;
 		if(gameEvent != null){
 			/**
 			 * 举手了，表示游戏可以开始了
@@ -301,13 +349,13 @@ public class GameEngine {
 	 * @param orgi
 	 * @return
 	 */
-	public GameEvent gameRequest(String userid ,String playway , String room , String orgi , PlayUserClient playUser){
+	public GameEvent gameRequest(String userid ,String playway , String room , PlayUserClient playUser){
 		GameEvent gameEvent = null ;
 		String roomid = (String) CacheHelper.getRoomMappingCacheBean().getCacheObject(userid) ;
 		GamePlayway gamePlayway = (GamePlayway) CacheHelper.getSystemCacheBean().getCacheObject(playway) ;
 		boolean needtakequene = false;
 		if(gamePlayway!=null){
-			gameEvent = new GameEvent(gamePlayway.getPlayers() , gamePlayway.getCardsnum() , orgi) ;
+			gameEvent = new GameEvent(gamePlayway.getPlayers() , gamePlayway.getCardsnum()) ;
 			GameRoom gameRoom = null ;
 			if(!StringUtils.isBlank(roomid) && CacheHelper.getGameRoomCacheBean().getCacheObject(roomid)!=null){//
 				gameRoom = (GameRoom) CacheHelper.getGameRoomCacheBean().getCacheObject(roomid) ;		//直接加入到 系统缓存 （只有一个地方对GameRoom进行二次写入，避免分布式锁）

@@ -30,6 +30,7 @@ cc.Class({
     login:function(){
         this.io = require("IOUtils");
         this.loadding();
+        this.io.remove("userinfo")
         if(this.io.get("userinfo") == null){
             //发送游客注册请求
             var xhr = cc.beimi.http.httpGet("/api/guest", this.sucess , this.error , this);

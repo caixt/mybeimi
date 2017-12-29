@@ -71,7 +71,7 @@ public class GameEventHandler   {
 				 */
 				userClient.setOnline(true);
 				
-				BMDataContext.getGameEngine().gameRequest(userToken.getUserid(), beiMiClient.getPlayway(), beiMiClient.getRoom(), beiMiClient.getOrgi(), userClient , beiMiClient) ;
+				BMDataContext.getGameEngine().gameRequest(userToken.getUserid(), beiMiClient.getPlayway(), beiMiClient.getRoom(), userClient , beiMiClient) ;
 			}
 		}
     }
@@ -143,6 +143,22 @@ public class GameEventHandler   {
 				PlayUserClient playUser = (PlayUserClient) CacheHelper.getApiUserCacheBean().getCacheObject(userToken.getUserid()) ;
 				String roomid = (String) CacheHelper.getRoomMappingCacheBean().getCacheObject(playUser.getId()) ;
 				BMDataContext.getGameEngine().takeCardsRequest(roomid, userToken.getUserid(), false , null);
+			}
+		}
+    }
+    
+    //重新开始
+    @OnEvent(value = "restart")   
+    public void onRestart(SocketIOClient client , String data)  
+    {  
+    	BeiMiClient beiMiClient = NettyClients.getInstance().getClient(client.getSessionId().toString()) ;
+    	String token = beiMiClient.getToken();
+		if(!StringUtils.isBlank(token)){
+			Token userToken = (Token) CacheHelper.getApiUserCacheBean().getCacheObject(token) ;
+			if(userToken!=null){
+				PlayUserClient playUser = (PlayUserClient) CacheHelper.getApiUserCacheBean().getCacheObject(userToken.getUserid()) ;
+				String roomid = (String) CacheHelper.getRoomMappingCacheBean().getCacheObject(playUser.getId()) ;
+				BMDataContext.getGameEngine().restartRequest(roomid, playUser.getId(), beiMiClient);
 			}
 		}
     }

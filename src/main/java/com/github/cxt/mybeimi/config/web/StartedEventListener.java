@@ -52,23 +52,6 @@ public class StartedEventListener implements ApplicationListener<ContextRefreshe
     	
     	gamePlayway = new GamePlayway();
     	gamePlayway.setId("gameplayway02");
-    	gamePlayway.setName("高级场");
-    	gamePlayway.setCode("dizhu");
-    	gamePlayway.setScore(50000);
-    	gamePlayway.setMincoins(50000);
-    	gamePlayway.setMaxcoins(200000);
-    	gamePlayway.setChangecard(false);
-    	gamePlayway.setShuffle(true);
-    	gamePlayway.setTypelevel("2");
-    	gamePlayway.setTypecolor("2");
-    	gamePlayway.setCardsnum(17);
-    	gamePlayway.setPlayers(3);
-    	gamePlayway.setShuffletimes(1);
-    	CacheHelper.getSystemCacheBean().put(gamePlayway.getId(), gamePlayway);
-    	gamePlayways.add(gamePlayway);
-    	
-    	gamePlayway = new GamePlayway();
-    	gamePlayway.setId("gameplayway03");
     	gamePlayway.setName("初级场（不洗牌）");
     	gamePlayway.setCode("dizhu");
     	gamePlayway.setScore(10000);
@@ -78,6 +61,23 @@ public class StartedEventListener implements ApplicationListener<ContextRefreshe
     	gamePlayway.setShuffle(false);
     	gamePlayway.setTypelevel("1");
     	gamePlayway.setTypecolor("1");
+    	gamePlayway.setCardsnum(17);
+    	gamePlayway.setPlayers(3);
+    	gamePlayway.setShuffletimes(1);
+    	CacheHelper.getSystemCacheBean().put(gamePlayway.getId(), gamePlayway);
+    	gamePlayways.add(gamePlayway);
+    	
+    	gamePlayway = new GamePlayway();
+    	gamePlayway.setId("gameplayway03");
+    	gamePlayway.setName("高级场");
+    	gamePlayway.setCode("dizhu");
+    	gamePlayway.setScore(50000);
+    	gamePlayway.setMincoins(50000);
+    	gamePlayway.setMaxcoins(200000);
+    	gamePlayway.setChangecard(false);
+    	gamePlayway.setShuffle(true);
+    	gamePlayway.setTypelevel("2");
+    	gamePlayway.setTypecolor("2");
     	gamePlayway.setCardsnum(17);
     	gamePlayway.setPlayers(3);
     	gamePlayway.setShuffletimes(1);

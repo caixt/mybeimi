@@ -78,6 +78,7 @@ cc.Class({
     initgame:function(opendeal){
         let self = this ;
         this.gamebtn.active = false ;
+        
         if(this.ready()) {
             let socket = this.socket();
 

@@ -2,25 +2,19 @@ package com.github.cxt.mybeimi.core.engine.game.state;
 
 import com.github.cxt.mybeimi.web.model.GameRoom;
 
-public class GameEvent implements java.io.Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1606276594008150495L;
+public class GameEvent {
 	
-	public GameEvent(int players , int cardsnum , String orgi){
+	public GameEvent(int players , int cardsnum ){
 		this.players = players ;
 		this.time = System.currentTimeMillis() ;
-		this.orgi = orgi ;
 		this.cardsnum = cardsnum ;
 	}
 	
-	public GameEvent(String roomid , String event , int players , int cardsnum , long time , String orgi){
+	public GameEvent(String roomid , String event , int players , int cardsnum , long time ){
 		this.roomid = roomid ;
 		this.event = event ;
 		this.players = players ;
 		this.time = time ;
-		this.orgi = orgi ;
 		this.cardsnum = cardsnum ;
 		
 	}

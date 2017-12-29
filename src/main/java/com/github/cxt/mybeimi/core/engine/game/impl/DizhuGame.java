@@ -45,8 +45,8 @@ public class DizhuGame implements ChessGame{
 		board.setRatio(15); 	//默认倍率 15
 		int random = playUsers.size() * gameRoom.getCardsnum() ;
 		
-//		board.setPosition((byte)new Random().nextInt(random));	//按照人数计算在随机界牌 的位置，避免出现在底牌里
-		board.setPosition(2);
+		board.setPosition((byte)new Random().nextInt(random));	//按照人数计算在随机界牌 的位置，避免出现在底牌里
+//		board.setPosition(2);
 		
 		Player[] players = new Player[playUsers.size()];
 		

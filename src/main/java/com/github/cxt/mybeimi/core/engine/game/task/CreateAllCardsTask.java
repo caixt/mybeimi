@@ -39,9 +39,9 @@ public class CreateAllCardsTask extends AbstractTask implements ValueWithExpiryT
 			sendEvent("allcards",  summary , gameRoom) ;	//通知所有客户端结束牌局，进入结算
 			if(summary.isGameRoomOver()){
 				CacheHelper.getGamePlayerCacheBean().delete(gameRoom.getId()) ;
-				for(Player player : board.getPlayers()){
-					CacheHelper.getRoomMappingCacheBean().delete(player.getPlayuser()) ;
-				}
+//				for(Player player : board.getPlayers()){
+//					CacheHelper.getRoomMappingCacheBean().delete(player.getPlayuser()) ;
+//				}
 				/**
 				 * 重新加入房间资源到 队列
 				 */
