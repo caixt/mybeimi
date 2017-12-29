@@ -20,4 +20,10 @@ public class ApiUserCache implements CacheBean{
 	public Object getCacheObject(String key) {
 		return cache.get(key);
 	}
+
+
+	@Override
+	public boolean delete(String key) {
+		return cache.remove(key) != null;
+	}
 }

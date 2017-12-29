@@ -1,7 +1,7 @@
 package com.github.cxt.mybeimi.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class Base62 {
 	private static final int BINARY = 0x2;

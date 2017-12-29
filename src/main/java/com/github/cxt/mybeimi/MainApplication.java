@@ -23,5 +23,4 @@ public class MainApplication extends WebMvcConfigurerAdapter {
 		registry.addInterceptor(new CrossInterceptorHandler()).addPathPatterns("/**");
         super.addInterceptors(registry);
 	}
-
 }

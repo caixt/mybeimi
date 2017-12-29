@@ -2,6 +2,9 @@ package com.github.cxt.mybeimi.core;
 
 import org.springframework.context.ApplicationContext;
 
+import com.github.cxt.mybeimi.core.engine.game.GameEngine;
+
+
 public class BMDataContext {
 	public static final String USER_SESSION_NAME = "user";
 	public static final String GUEST_USER = "guest";
@@ -32,7 +35,7 @@ public class BMDataContext {
 	
 	private static ApplicationContext applicationContext ;
 	
-	
+	private static GameEngine gameEngine ;
 	
 	public static int getWebIMPort() {
 		return WebIMPort;
@@ -46,6 +49,9 @@ public class BMDataContext {
 		applicationContext = context ;
 	}
 	
+	public static void setGameEngine(GameEngine engine){
+		gameEngine = engine ;
+	}
 	
 	/**
 	 * 根据ORGI找到对应 游戏配置
@@ -60,6 +66,9 @@ public class BMDataContext {
 		return applicationContext ;
 	}
 	
+	public static GameEngine getGameEngine(){
+		return gameEngine; 
+	}
 	/**
 	 * 系统级的加密密码 ， 从CA获取
 	 * @return

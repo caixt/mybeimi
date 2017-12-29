@@ -14,4 +14,7 @@ public interface CacheBean {
 	 */
 	public Object getCacheObject(String key) ;
 	
+	
+	public boolean delete(String key) ;
+	
 }

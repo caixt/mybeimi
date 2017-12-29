@@ -1,14 +1,14 @@
 package com.github.cxt.mybeimi.web.model;
 
 import java.util.Date;
-import java.util.UUID;
+import com.github.cxt.mybeimi.util.UKTools;
 
 
 public class PlayUser{
 	/**
 	 * 
 	 */
-	private String id = UUID.randomUUID().toString();
+	private String id = UKTools.getUUID();
 	
 	private String username ;
 	private String password ;
