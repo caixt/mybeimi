@@ -174,17 +174,20 @@ public class BMDataContext {
 	}
 	
 	public enum CardsTypeEnum{
-		ONE(1),		//单张      3~K,A,2
-		TWO(2),		//一对	 3~K,A,2
-		THREE(3),	//三张	 3~K,A,2
-		FOUR(4),	//三带一	 AAA+K
-		FIVE(5),	//单顺	连子		10JQKA
-		SIX(6),		//双顺	连对		JJQQKK
-		SEVEN(7),	//三顺	飞机		JJJQQQ
-		EIGHT(8),	//飞机	带翅膀	JJJ+QQQ+K+A
-		NINE(9),	//四带二			JJJJ+Q+K
-		TEN(10),	//炸弹			JJJJ
-		ELEVEN(11);	//王炸			0+0
+		ONE(1),					   //单张      		3~K,A,2,小王,大王
+		TWO(2),					   //一对	 		3~K,A,2
+		THREE(3),				   //三张	 		3~K,A,2
+		THREEWING(31),			   //三带一	 	AAA+K
+		THREEWINGDOUBLE(32),	   //三带对	 	AAA+KK
+		FOUR(4),    			   //炸弹	 	  	JJJJ
+		FOURWING(41),			   //四带二		JJJJ +QK
+		FOURWINGDOUBLE(42),        //四带二对		JJJJ +QQKK
+		FIVE(5),				   //单顺	连子		10JQKA
+		SIX(6),					   //双顺	连对		JJQQKK
+		SEVEN(7),				   //三顺	飞机		JJJQQQ 
+		SEVENWING(71),			   //三顺	飞机带单	JJJQQQ + KA
+		SEVENWINGDOUBLE(72),	   //三顺	飞机带对	JJJQQQ + KKAA
+		EIGHT(8);				   //王炸			0+0
 		
 		private int type ;
 		

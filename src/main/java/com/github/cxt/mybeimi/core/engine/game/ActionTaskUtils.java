@@ -2,6 +2,7 @@ package com.github.cxt.mybeimi.core.engine.game;
 
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.github.cxt.mybeimi.core.BMDataContext;
@@ -93,11 +94,12 @@ public class ActionTaskUtils {
 			}
 		}else if(lastCardType.isBomb()){	//最后一手牌是炸弹 ， 当前出牌不是炸弹
 			allow = false ;
-		}else if(playCardType.getCardtype() == lastCardType.getCardtype() && playCardType.getCardtype()>0 && lastCardType.getCardtype() > 0){
-			if(playCardType.getMaxcard() > lastCardType.getMaxcard()){
+		}else if(playCardType.getCardtype() == lastCardType.getCardtype() && lastCardType.getCardtype() > 0){
+			if(playCardType.getCardnum() == lastCardType.getCardnum() && playCardType.getMaxcard() > lastCardType.getMaxcard()){
 				allow = true ;
-			}else if(playCardType.getMaxcardvalue() == 53){
-				allow = true ;
+			}
+			else if(playCardType.getCardnum() == 1 && playCardType.getMaxcardvalue() == 53){
+				allow = true;
 			}
 		}
 		return allow ;
@@ -120,14 +122,16 @@ public class ActionTaskUtils {
 		return types ;
 	}
 	/**
-	 * 牌型识别
+	 * 牌型识别 默认 从大到笑排序
 	 * @param cards
 	 * @return
 	 */
 	public static CardType identification(byte[] cards){
+		//17 20
+		int cardSize = cards.length;
 		CardType cardTypeBean = new CardType();
 		Map<Integer,Integer> types = new HashMap<Integer,Integer>();
-		int max = -1 , maxcard = -1 , cardtype = 0 , mincard = -1;
+		int max = -1 , maxcard = -1 , mincard = -1;
 		for(int i=0 ; i<cards.length ; i++){
 			int card = cards[i]/4 ;
 			if(types.get(card) == null){
@@ -139,77 +143,143 @@ public class ActionTaskUtils {
 				max = types.get(card) ;
 				maxcard = card ;
 			}
+			if(types.get(card) == max){
+				if(mincard < 0 || mincard > card){
+					mincard = card ;
+				}
+			}
+			
 			if(cards[i] > cardTypeBean.getMaxcardvalue()){
 				cardTypeBean.setMaxcardvalue(cards[i]);
 			}
-			if(mincard < 0 || mincard > card){
-				mincard = card ;
+		}
+		int min = 100;
+		Iterator<Integer> iterator = types.keySet().iterator() ;
+		while(iterator.hasNext()){
+			Integer key = iterator.next() ;
+			if(types.get(key) < min){
+				min = types.get(key) ;
 			}
 		}
-		cardTypeBean.setCardnum(max);
+		
+		cardTypeBean.setCardnum(cardSize);
 		cardTypeBean.setMincard(mincard);
 		cardTypeBean.setTypesize(types.size());
 		cardTypeBean.setMaxcard(maxcard);
 		
-		
+		int cardtype = 0;
 		switch(types.size()){
 			case 1 : 
 				switch(max){
 					case 1 : cardtype = BMDataContext.CardsTypeEnum.ONE.getType() ;break;		//单张
-					case 2 : cardtype = BMDataContext.CardsTypeEnum.TWO.getType() ;break;		//一对
+					case 2 : 
+						if(mincard > 12){
+							cardtype = BMDataContext.CardsTypeEnum.EIGHT.getType() ; //王炸
+						}
+						else{
+							cardtype = BMDataContext.CardsTypeEnum.TWO.getType() ; 	//一对
+						}
+						break;	
 					case 3 : cardtype = BMDataContext.CardsTypeEnum.THREE.getType() ;break;		//三张
-					case 4 : cardtype = BMDataContext.CardsTypeEnum.TEN.getType() ;break;		//炸弹
+					case 4 : cardtype = BMDataContext.CardsTypeEnum.FOUR.getType() ;break;		//炸弹
 				}
 				;break ;
-			case 2 :
+			case 2 : 
 				switch(max){
-					case 1 : if(mincard > 52){cardtype = BMDataContext.CardsTypeEnum.ELEVEN.getType();} break;	//王炸
-					case 3 : cardtype = BMDataContext.CardsTypeEnum.FOUR.getType() ;break;	//三带一（或一对）
-					case 4 : cardtype = BMDataContext.CardsTypeEnum.NINE.getType() ;break;	//四带一对
+					case 3 :
+						if(min == 1){//三带一
+							cardtype = BMDataContext.CardsTypeEnum.THREEWING.getType() ;
+						}else if(min == 2){//三带一对
+							cardtype = BMDataContext.CardsTypeEnum.THREEWINGDOUBLE.getType() ;
+						}else if(min == 3 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ; //333444
+						}
+						break;	
+					case 4 : if(min == 2) cardtype = BMDataContext.CardsTypeEnum.FOURWING.getType() ;break;	//444433
 				}
 				;break ;
 			case 3 : 
 				switch(max){
-					case 1 : ;break;	//无牌型
-					case 2 : if(cards.length == 6){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//双顺 ， 3连对
-					case 3 : cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ;break;		//三顺
-					case 4 : cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ;break;		//四带二
+					case 2 : if(maxcard < 12 && min == max && isAva(types, mincard, maxcard)){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;	//334455
+					case 3 : 
+						if(min == max && maxcard < 12 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ; //333444555
+						} else if(min == 2 && (maxcard - mincard) == 1 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVENWING.getType() ; //33344466
+						}
+						break;
+					case 4 : 
+						if(cardSize == 6 ){
+							cardtype = BMDataContext.CardsTypeEnum.FOURWING.getType(); //444435
+						}
+						else if(cardSize == 8 && min == 2) {
+							cardtype = BMDataContext.CardsTypeEnum.FOURWINGDOUBLE.getType() ;//44443355
+						}
+						break;
+						//TODO 33344445
 				}
 				break;
 			case 4 : 
 				switch(max){
-					case 1 : ;break;		//无牌型
-					case 2 : if(cards.length == 8){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//双顺 ， 4连对
-					case 3 : if(cards.length == 8 || cards.length == 10){cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ;}break;		//双顺 ， 4连对
-				};break ;
+					case 2 : if(min == 2 && maxcard < 12 && isAva(types, mincard, maxcard)){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//33445566
+					case 3 : 
+						if(min == 3){
+							if(maxcard < 12 && isAva(types, mincard, maxcard)){
+								cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ; //33344445556666
+							}
+							//TODO 333444555888
+						}
+						else if(cardSize == 10 && min == 2 && maxcard < 12 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVENWINGDOUBLE.getType() ;  //3334445566
+						}
+						else if(cardSize == 8 && (maxcard - mincard) == 1 && maxcard < 12 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVENWING.getType() ; //33344456
+						}
+						break;
+					case 4 :
+						//TODO 3333444455556666当三带1处理
+						break;
+				};
+				break ;
 			case 5 : 
 				switch(max){
-					case 1 : if(isAva(types ,mincard)){cardtype = BMDataContext.CardsTypeEnum.FIVE.getType() ;}break;		//连子
-					case 2 : if(cards.length == 10){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//5连对
-					case 3 : cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ;break;		//5飞机
+					case 1 : if(isAva(types ,mincard, maxcard)){cardtype = BMDataContext.CardsTypeEnum.FIVE.getType() ;}break;		//34567
+					case 2 : if(min == 2 && isAva(types, mincard, maxcard)){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//3344556677
+					case 3 : 
+						if(min == 3 && maxcard < 12 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ; //333444555666777
+						}
+						else if(cardSize == 12 && maxcard < 12 && (maxcard - mincard) == 2 && isAva(types, mincard, maxcard)){
+							cardtype = BMDataContext.CardsTypeEnum.SEVENWING.getType() ;//333444555677
+						}
+						break;
+					case 4 :
+						//TODO 33334444555566667777当三带1处理
+						break;
 				};break ;
 			case 6 : 
 				switch(max){
-					case 1 : if(isAva(types ,mincard)){cardtype = BMDataContext.CardsTypeEnum.FIVE.getType() ;}break;		//连子
-					case 2 : if(cards.length == 12){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//6连对
-					case 3 : cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ;break;		//6飞机
+					case 1 : if(maxcard < 12 && isAva(types ,mincard, maxcard)){cardtype = BMDataContext.CardsTypeEnum.FIVE.getType() ;}break;		//345678
+					case 2 : if(maxcard < 12 && isAva(types ,mincard, maxcard) && max == min){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//334455667788
+					case 3 : if(maxcard < 12 && isAva(types ,mincard, maxcard) && max == min){cardtype = BMDataContext.CardsTypeEnum.SEVEN.getType() ;}break;		//6飞机
 				};break ;
 			default: 
 				switch(max){
-					case 1 : if(isAva(types ,mincard)){cardtype = BMDataContext.CardsTypeEnum.FIVE.getType() ;}break;		//连子
-					case 2 : cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;break;		//连对
+				case 1 : if(maxcard < 12 && isAva(types ,mincard, maxcard)){cardtype = BMDataContext.CardsTypeEnum.FIVE.getType() ;}break;		//345678....
+				case 2 : if(maxcard < 12 && isAva(types ,mincard, maxcard) && max == min){cardtype = BMDataContext.CardsTypeEnum.SIX.getType() ;}break;		//334455667788..
 				};break ;
 		}
 		cardTypeBean.setCardtype(cardtype);
-		cardTypeBean.setKing(cardtype == BMDataContext.CardsTypeEnum.ELEVEN.getType());
-		cardTypeBean.setBomb(cardtype == BMDataContext.CardsTypeEnum.TEN.getType());
+		cardTypeBean.setKing(cardtype == BMDataContext.CardsTypeEnum.EIGHT.getType());
+		cardTypeBean.setBomb(cardtype == BMDataContext.CardsTypeEnum.FOUR.getType());
 		return cardTypeBean ;
 	}
 	
-	private static boolean isAva(Map<Integer,Integer> types , int mincard){
+	private static boolean isAva(Map<Integer,Integer> types , int mincard, int maxcard){
 		boolean ava = true ;
-		for(int i=mincard ; i<(mincard + types.size())  ; i++){
-			if(types.get(i) == null){
+		int value = types.get(mincard);
+		for(int i= mincard ; i <= maxcard; i++){
+			if(types.get(i) == null || types.get(i) != value){
 				ava = false  ;
 			}
 		}

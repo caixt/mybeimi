@@ -2,6 +2,8 @@ package com.github.cxt.mybeimi.core.engine.game.task.dizhu;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.cxt.mybeimi.core.BMDataContext;
 import com.github.cxt.mybeimi.core.engine.game.ActionTaskUtils;
 import com.github.cxt.mybeimi.core.engine.game.BeiMiGameEvent;
@@ -35,7 +37,6 @@ public class CreateAutoTask extends AbstractTask implements BeiMiGameTask{
 	}
 	
 	public void execute(){
-		System.out.println("!!!!!!!!!");
 		DuZhuBoard board = (DuZhuBoard) CacheHelper.getBoardCacheBean().getCacheObject(gameRoom.getId());
 		Player randomCardPlayer = null , catchPlayer = null;
 		int index = 0 ;
@@ -56,10 +57,31 @@ public class CreateAutoTask extends AbstractTask implements BeiMiGameTask{
 			}else{
 				catchPlayer = randomCardPlayer;
 			}
-			if(catchPlayer == null && randomCardPlayer.isRecatch() == false && !board.getBanker().equals(randomCardPlayer.getPlayuser())){
-				//
-				catchPlayer = randomCardPlayer ;	//起到地主牌的人第二次抢地主 ， 抢完就结束了
-				randomCardPlayer.setRecatch(true);
+			/**
+			 * 第二次抢地主条件：
+			 * 	1、抓到随机牌的人
+			 *  2、已经叫过一次地主了
+			 *  3、其他有人抢了地主
+			 *  4、首次地主选择 了 叫地主
+			 */
+			if(catchPlayer == null){
+				/**
+				 * 抓到随机牌的人如果选择了不叫地主，则二次选择的玩家是下一个 抢了地主的玩家
+				 */
+				if(randomCardPlayer.isRecatch() == false && !board.getBanker().equals(randomCardPlayer.getPlayuser()) && randomCardPlayer.isAccept()){
+					catchPlayer = randomCardPlayer ;	//起到地主牌的人第二次抢地主 ， 抢完就结束了
+					randomCardPlayer.setRecatch(true);
+				}else if(board.getBanker() == null){
+					//流局了
+				}else if(!StringUtils.isBlank(board.getBanker()) && randomCardPlayer.isAccept() == false && randomCardPlayer.isDocatch()){
+					//下一个抢地主的人
+					Player temp = board.nextPlayer(index) ;
+					if(temp.isAccept() && temp.isRecatch() == false){
+						catchPlayer = temp ;
+						temp.setRecatch(true);
+					}
+					
+				}
 			}
 		}
 		/**

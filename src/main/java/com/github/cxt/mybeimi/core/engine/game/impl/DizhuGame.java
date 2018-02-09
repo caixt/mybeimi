@@ -46,7 +46,7 @@ public class DizhuGame implements ChessGame{
 		int random = playUsers.size() * gameRoom.getCardsnum() ;
 		
 		board.setPosition((byte)new Random().nextInt(random));	//按照人数计算在随机界牌 的位置，避免出现在底牌里
-//		board.setPosition(2);
+//		board.setPosition(0);
 		
 		Player[] players = new Player[playUsers.size()];
 		

@@ -29,8 +29,10 @@ public class CreateAITask extends AbstractTask implements  BeiMiGameTask{
 	
 	public void execute(){
 		//执行生成AI
-		boolean b = GameUtils.removeGameRoom(gameRoom);
-		System.out.println(b);
+		boolean removeRoom = GameUtils.removeGameRoom(gameRoom);
+		if(!removeRoom){
+			return ;
+		}
 		List<PlayUserClient> playerList = CacheHelper.getGamePlayerCacheBean().getCacheObject(gameRoom.getId()) ;
 		/**
 		 * 清理 未就绪玩家

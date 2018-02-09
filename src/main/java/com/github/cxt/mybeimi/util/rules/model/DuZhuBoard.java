@@ -208,7 +208,7 @@ public class DuZhuBoard extends Board {
 			}else{		
 				takeCards.setDonot(true);	//不出牌
 			}
-			if(takeCards.getCardType()!=null && (takeCards.getCardType().getCardtype() == BMDataContext.CardsTypeEnum.TEN.getType() || takeCards.getCardType().getCardtype() == BMDataContext.CardsTypeEnum.ELEVEN.getType())){
+			if(takeCards.getCardType()!=null && (takeCards.getCardType().getCardtype() == BMDataContext.CardsTypeEnum.FOUR.getType() || takeCards.getCardType().getCardtype() == BMDataContext.CardsTypeEnum.EIGHT.getType())){
 				takeCards.setBomb(true);
 				ActionTaskUtils.doBomb(board, true);
 				ActionTaskUtils.sendEvent("ratio", new BoardRatio(takeCards.isBomb(), false , board.getRatio()), gameRoom);	

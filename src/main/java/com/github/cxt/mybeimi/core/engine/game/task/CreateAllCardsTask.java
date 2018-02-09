@@ -7,7 +7,6 @@ import com.github.cxt.mybeimi.core.engine.game.BeiMiGameTask;
 import com.github.cxt.mybeimi.core.engine.game.model.Summary;
 import com.github.cxt.mybeimi.util.cache.CacheHelper;
 import com.github.cxt.mybeimi.util.rules.model.Board;
-import com.github.cxt.mybeimi.util.rules.model.Player;
 import com.github.cxt.mybeimi.web.model.GamePlayway;
 import com.github.cxt.mybeimi.web.model.GameRoom;
 import com.github.cxt.mybeimi.web.model.PlayUserClient;

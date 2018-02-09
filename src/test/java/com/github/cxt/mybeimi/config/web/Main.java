@@ -176,6 +176,7 @@ public class Main {
 					logger.info("我不抢地主");
 					gameEventHandler.onGiveup(socketIOClient, null);
 				}
+				
 			}
 			else if(StringUtils.equals("lasthands", commond)){
 				if(StringUtils.equals(board.getUserid(), userId)){

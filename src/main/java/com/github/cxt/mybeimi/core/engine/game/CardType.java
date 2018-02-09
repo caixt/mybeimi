@@ -8,7 +8,7 @@ public class CardType {
 	private boolean king ;	//王炸
 	private boolean bomb;	//炸弹
 	private int mincard ; 	//最小的牌
-	private int cardnum ;	//最大牌张数  ， JJJQ，= 3
+	private int cardnum ;	//牌张数  ， JJJQ，= 4
 	private byte maxcardvalue ;
 	
 	public CardType(){}
