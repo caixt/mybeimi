@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.cxt.mybeimi.core.engine.game.ActionTaskUtils;
 import com.github.cxt.mybeimi.core.engine.game.CardType;
 import com.github.cxt.mybeimi.util.rules.model.Player;
+import com.github.cxt.mybeimi.util.rules.model.TakeCards;
 import com.github.cxt.mybeimi.util.rules.model.TakeDiZhuCards;
 
 public class ActionTaskUtilsTest {
@@ -173,6 +174,21 @@ public class ActionTaskUtilsTest {
 		player.setCards(formate("33355小王大王"));
 		byte[] b = takeDiZhuCards.getAIMostSmall(player, 0);
 		System.out.println(b.length);
+	}
+	
+	
+	@Test
+	public void test4(){
+		TakeDiZhuCards takeDiZhuCards = new TakeDiZhuCards();
+		Player player = new Player("id");
+		player.setCards(formate("3344999"));
+		
+		TakeCards takeCards = new TakeDiZhuCards();
+		takeCards.setCardType(ActionTaskUtils.identification(formate("8883")));
+		byte[] b = takeDiZhuCards.search(player, takeCards);
+		if(b != null){
+			System.out.println(b.length);
+		}
 	}
 				
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
+
+import com.github.cxt.mybeimi.core.BMDataContext.CardsTypeEnum;
 import com.github.cxt.mybeimi.core.engine.game.ActionTaskUtils;
 import com.github.cxt.mybeimi.core.engine.game.CardType;
 import com.github.cxt.mybeimi.core.engine.game.Message;
@@ -98,7 +100,7 @@ public class TakeDiZhuCards extends TakeCards implements Message{
 	}
 	
 	/**
-	 * 搜索符合条件的当前最小 牌型 , 机器人出牌 ， 只处理到 三带一，其他以后在扩展
+	 * 搜索符合条件的当前最小 牌型 , 机器人出牌 ， 只处理到 三带一,三带一对，其他以后在扩展
 	 * @param player
 	 * @param last
 	 * @return
@@ -107,32 +109,39 @@ public class TakeDiZhuCards extends TakeCards implements Message{
 		byte[] retValue = null ;
 		Map<Integer,Integer> types = ActionTaskUtils.type(player.getCards()) ;
 		if(lastTakeCards!=null && lastTakeCards.getCardType()!=null){
-			switch(lastTakeCards.getCardType().getCardtype()){
-				case 1 : //单张
-					retValue = this.getSingle(player.getCards(), types, lastTakeCards.getCardType().getMincard(), 1) ;
-					break ;
-				case 2 : //一对儿
-					retValue = this.getPair(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
-					break ;
-				case 3 : //三张
-					retValue = this.getThree(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
-					break ;
-				case 4 : //三带一
-					retValue = this.getThree(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
-					if(retValue!=null && retValue.length == 3){
-						byte[] supplement = null ;
-						if(lastTakeCards.getCards().length == 4){	//三带一
-							supplement = this.getSingle(player.getCards(), types, -1 , 1) ;
-						}else if(lastTakeCards.getCards().length == 5){	//三带一对儿
-							supplement = this.getPair(player.getCards(), types , -1, 1) ;
-						}else if(lastTakeCards.getCards().length == 6){	//三顺
-							supplement = this.getThree(player.getCards(), types , -1, 1) ;
-						}
-						if(supplement!=null){
-							retValue = ArrayUtils.addAll(retValue, supplement) ;
-						}
+			int type = lastTakeCards.getCardType().getCardtype();
+			if(type == CardsTypeEnum.ONE.getType()){
+				retValue = this.getSingle(player.getCards(), types, lastTakeCards.getCardType().getMincard(), 1) ;
+			}
+			else if(type == CardsTypeEnum.TWO.getType()){
+				retValue = this.getPair(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
+			}
+			else if(type == CardsTypeEnum.THREE.getType()){
+				retValue = this.getThree(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
+			}
+			else if(type == CardsTypeEnum.THREEWING.getType()){
+				retValue = this.getThree(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
+				if(retValue!=null){
+					byte[] supplement = this.getSingle(player.getCards(), types, -1 , 1) ;
+					if(supplement != null){
+						retValue = ArrayUtils.addAll(retValue, supplement) ;
 					}
-					break ;
+					else {
+						retValue = null;
+					}
+				}
+			}
+			else if(type == CardsTypeEnum.THREEWING.getType()){
+				retValue = this.getThree(player.getCards(), types, lastTakeCards.getCardType().getMincard() ,1) ;
+				if(retValue!=null){
+					byte[] supplement = this.getPair(player.getCards(), types, -1 , 1) ;
+					if(supplement != null){
+						retValue = ArrayUtils.addAll(retValue, supplement) ;
+					}
+					else {
+						retValue = null;
+					}
+				}
 			}
 		}
 		return retValue ;
